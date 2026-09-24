@@ -121,6 +121,10 @@ if zicht.empty:
 
 # --- 1. Roken en het stadium ----------------------------------------------
 st.header("1. Rokers krijgen bijna twee keer zo vaak een late diagnose")
+st.caption(
+    "De percentages hieronder zijn het aandeel patienten met een **late diagnose** "
+    "(stadium III of IV) - dus niet het aandeel dat overleed."
+)
 
 per_rookstatus = (zicht.groupby("Rookstatus")["Laat_stadium"].mean() * 100).round(1)
 per_rookstatus = per_rookstatus.reindex([r for r in ROOKVOLGORDE if r in per_rookstatus.index])
@@ -158,6 +162,10 @@ overleving.columns = ["patienten", "% overleefd", "gem. maanden"]
 kol1, kol2 = st.columns([1, 1])
 with kol1:
     st.dataframe(overleving, width="stretch")
+    st.caption(
+        "Let op: hier staan percentages **overleefd** - hoe hoger, hoe beter. In de "
+        "andere secties gaat het om het percentage *laat ontdekt*."
+    )
 with kol2:
     st.markdown(
         "Laat ontdekken is geen administratief detail. Van de patienten met stadium I "
