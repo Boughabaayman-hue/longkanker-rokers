@@ -9,7 +9,6 @@ Bronnen:
 - kagglehub-documentatie voor dataset_load()
 - Claude (AI-assistent) voor de opzet van de opschoon- en koppelstappen
 """
-import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 import kagglehub
@@ -131,13 +130,8 @@ per_rookstatus = per_rookstatus.reindex([r for r in ROOKVOLGORDE if r in per_roo
 
 kol1, kol2 = st.columns([2, 1])
 with kol1:
-    fig, ax = plt.subplots(figsize=(7, 3.5))
-    ax.barh(per_rookstatus.index, per_rookstatus.values)
-    ax.set_xlabel("Percentage laat ontdekt (stadium III/IV)")
-    ax.set_xlim(0, 100)
-    for i, v in enumerate(per_rookstatus.values):
-        ax.text(v + 1, i, f"{v}%", va="center")
-    st.pyplot(fig)
+    st.bar_chart(per_rookstatus, horizontal=True,
+                 x_label="Percentage laat ontdekt (stadium III/IV)", y_label="")
 with kol2:
     st.markdown(
         "Van de huidige rokers krijgt het grootste deel de diagnose pas in stadium III "
@@ -198,14 +192,9 @@ else:
 
     kol1, kol2 = st.columns([2, 1])
     with kol1:
-        fig2, ax2 = plt.subplots(figsize=(7, 4.5))
-        ax2.scatter(per_land[index_keuze], per_land["pct_laat"])
-        for _, r in per_land.nlargest(3, "pct_laat").iterrows():
-            ax2.annotate(r["Land"], (r[index_keuze], r["pct_laat"]),
-                         textcoords="offset points", xytext=(5, 4))
-        ax2.set_xlabel(f"{index_keuze} van het land (index)")
-        ax2.set_ylabel("Percentage laat ontdekt")
-        st.pyplot(fig2)
+        st.scatter_chart(per_land, x=index_keuze, y="pct_laat",
+                         x_label=f"{index_keuze} van het land (index)",
+                         y_label="Percentage laat ontdekt")
     with kol2:
         st.metric(f"Correlatie met {index_keuze.lower()}", f"{correlatie:.3f}")
         st.markdown(
@@ -219,6 +208,9 @@ else:
             "landen bepalen een paar punten het getal - dat is precies waarom we er "
             "geen conclusie op baseren."
         )
+        st.markdown("**De drie landen met het hoogste percentage:**")
+        st.dataframe(per_land.nlargest(3, "pct_laat")[["Land", "patienten", "pct_laat"]],
+                     hide_index=True, width="stretch")
 
 # --- 4. Verandert het over tijd? ------------------------------------------
 st.header("4. Tussen beide periodes verandert er weinig")
@@ -229,14 +221,7 @@ tabel = tabel[[r for r in ROOKVOLGORDE if r in tabel.columns]]
 
 kol1, kol2 = st.columns([2, 1])
 with kol1:
-    fig3, ax3 = plt.subplots(figsize=(7, 3.5))
-    tabel.plot(kind="bar", ax=ax3)
-    ax3.set_ylabel("Percentage laat ontdekt")
-    ax3.set_xlabel("")
-    ax3.set_ylim(0, 100)
-    plt.xticks(rotation=0)
-    ax3.legend(title="")
-    st.pyplot(fig3)
+    st.bar_chart(tabel, stack=False, x_label="", y_label="Percentage laat ontdekt")
 with kol2:
     st.markdown(
         "Tussen 2015-2019 en 2020-2024 blijven de percentages vrijwel gelijk. Bij "
